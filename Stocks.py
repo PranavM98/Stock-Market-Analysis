@@ -3,7 +3,7 @@ import numpy as np
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import time
-
+import datetime
 import matplotlib.pyplot as plt
 #from winsound import *
 from PIL import ImageTk,Image 
@@ -14,30 +14,45 @@ import pygame
 def analysis(span):
     pygame.init()
     
-    b=float(span.text)
-    to_append = [b]
-    df_length = len(df)
-    df.loc[df_length] = to_append
-    plotgraph(df)
-
-    '''
-    if b>a: #New Price is higher than the Previous Price
-        
-        pygame.mixer.music.load('Sad.mp3')
-        pygame.mixer.music.play(0)
-    else:
-     
-        pygame.mixer.music.load('Sad.mp3')
-        pygame.mixer.music.play(0)
-    '''
-    a=b
     
-    if a==64.10:
+    
+    price=float(span.text)
+    final_lst.append(price)
+    
+    length=len(final_lst)
+    
+    
+    if length!=1:
+        
+    
+        if final_lst[length-1]>final_lst[length-2]: #New Price is higher than the Previous Price
+            
+            pygame.mixer.music.load('Sad.mp3')
+            pygame.mixer.music.play(0)
+        
+        elif final_lst[length-1]<final_lst[length-2]: # New price is lower than previous price
+     
+            pygame.mixer.music.load('Sad.mp3')
+            pygame.mixer.music.play(0)
+        
+        else:
+            
+            print("No Change")
+            
+
+    
+    '''if a==64.10:
     
         pygame.mixer.music.load('Ta_da.mp3')
         pygame.mixer.music.play(0)
-        
-
+    '''    
+    
+    
+    
+    
+    
+    df.loc[len(df)] = [price]
+    plotgraph(df)
     
 def plotgraph(df):
 
@@ -71,10 +86,19 @@ def url():
 
 if __name__ == "__main__":
     df=pd.DataFrame(columns=["Price"])
+    clock=0
     final_lst=[]
-
-    while True:    
-        url()
-        time.sleep(10)
-    
-    
+    while True:
+        now = datetime.datetime.now()
+        seven_pm = now.replace(hour=19, minute=0, second=0, microsecond=0)
+        one_am=now.replace(hour=1,minute=30,second=0,microsecond=0)
+        
+        print("NOW:",now)
+        print("7 PM:",seven_pm)
+        print("1:30 AM:",one_am)
+        
+        while now>seven_pm and now<one_am:    
+            url()
+            time.sleep(10)
+        print("")
+        time.sleep(300)
