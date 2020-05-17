@@ -7,7 +7,7 @@ import datetime
 import matplotlib.pyplot as plt
 #from winsound import *
 from PIL import ImageTk,Image 
-
+import csv
 import pygame
 
 
@@ -101,4 +101,9 @@ if __name__ == "__main__":
             url()
             time.sleep(10)
         print("")
-        time.sleep(300)
+        break
+    data=df.to_csv('Data'+clock+'.csv')
+    count=count+1
+        
+        
+        
