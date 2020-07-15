@@ -6,9 +6,11 @@ import time
 import datetime
 import matplotlib.pyplot as plt
 #from winsound import *
+from gtts import gTTS 
 from PIL import ImageTk,Image 
 import csv
 import pygame
+import os 
 
 
 def analysis(span):
@@ -29,25 +31,46 @@ def analysis(span):
             
             pygame.mixer.music.load('Ta_da.mp3')
             pygame.mixer.music.play(0)
+            
+            change_percentage=float((final_lst[length-1]-final_lst[length-2])/final_lst[length-2])*100
+            
+            text="B M S Stock Price went up by "+str(change_percentage)+" percent"
+            print(text)
+            myobj = gTTS(text=text, lang='en', slow=False) 
+            myobj.save("text.mp3") 
+            pygame.mixer.music.load('text.mp3')
+            pygame.mixer.music.play(0)
+
         
         elif final_lst[length-1]<final_lst[length-2]: # New price is lower than previous price
      
             pygame.mixer.music.load('Sad.mp3')
             pygame.mixer.music.play(0)
+            
+            change_percentage=float(abs(final_lst[length-1]-final_lst[length-2])/final_lst[length-2])*100
+            text="B M S Stock Price went down by "+str(change_percentage)+" percent"
+            print(text)
+            myobj = gTTS(text=text, lang='en', slow=False) 
+            myobj.save("text.mp3") 
+            pygame.mixer.music.load('text.mp3')
+            pygame.mixer.music.play(0)
+
+            
         
         else:
             
             print("No Change")
+            change_percentage=float(abs(final_lst[length-1]-final_lst[length-2])/final_lst[length-2])*100
+            text="B M S stock price has not changed."
+            
+            myobj = gTTS(text=text, lang='en', slow=False) 
+            myobj.save("text.mp3") 
+            pygame.mixer.music.load('text.mp3')
+            pygame.mixer.music.play(0)
+            os.remove("text.mp3") #remove the file from the system
             
 
-    
-    '''if a==64.10:
-    
-        pygame.mixer.music.load('Ta_da.mp3')
-        pygame.mixer.music.play(0)
-    '''    
-    
-    
+            
     
     
     
