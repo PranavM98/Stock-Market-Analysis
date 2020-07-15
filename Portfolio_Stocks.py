@@ -10,7 +10,7 @@ from PIL import ImageTk,Image
 import csv
 import pygame
 from gtts import gTTS 
-
+import os
 
 
 def texttoaudio(text):
@@ -19,7 +19,7 @@ def texttoaudio(text):
     pygame.mixer.music.load('text.mp3')
     pygame.mixer.music.play(0)
     os.remove("text.mp3") #remove file from system
-    time.sleep(3)
+    time.sleep(8)
 
 
 def analysis(data):
@@ -53,21 +53,15 @@ def analysis(data):
             previous=i[length-2]
             
             #Sometimes if the price is 4 digits (6,243.53), remove the comma
-            if new.find(',')!=-1:
-                new=new.replace(',','')
  
-
-            if previous.find(',')!=-1:
-                previous=previous.replace(',','')
-                
-            
             
             new=float(new)
             previous=float(previous)
-            print("NEW: ",new)
             print("PREVIOUS: ",previous)
+            print("NEW: ",new)
+
                 
-            change_percentage=float((new-previous)/previous)*100
+            change_percentage=round(float((new-previous)/previous)*100,2)
          
     
             if new>previous: #New price higher than previous price
@@ -82,8 +76,8 @@ def analysis(data):
             elif new<previous:
                 
                      
-                pygame.mixer.music.load('Sad.mp3')
-                pygame.mixer.music.play(0)
+                #pygame.mixer.music.load('Sad.mp3')
+                #pygame.mixer.music.play(0)
                 
                 text=company+" Stock Price went down by "+str(change_percentage)+" percent"
                 texttoaudio(text)
@@ -91,8 +85,8 @@ def analysis(data):
     
             else:
                 print("No Change")
-                text=company +" stock price has not changed."
-                texttoaudio(text)
+                #text=company +" stock price has not changed."
+                #texttoaudio(text)
             
             count=count+1
         
@@ -101,26 +95,24 @@ def analysis(data):
     
 def plotgraph(data):
 
-    fig, axs = plt.subplots(3,1,constrained_layout=True)
-    
-    axs[0].plot(data.index,data['Price-BMS'], color='r', label='BMS')
-    axs[0].set_title('Bristol Myers Squibb',fontname="Times New Roman Bold")
+    #fig, axs = plt.subplots(3,1,constrained_layout=True)
+
+    plt.plot(data['Price-BMS'], color='r', label='BMS')
+    plt.title('Bristol Myers Squibb',fontname="Times New Roman Bold")
     #axs[0].set_xlabel('Time')
-    axs[0].set_ylabel('Price')
+    plt.ylabel('Price')
+    plt.show()
     
-    
-    axs[1].plot(data.index, data['Price-GS'],color='g', label='GS')
-    axs[1].set_title('Goldman Sachs',fontname="Times New Roman Bold")
+    plt.plot(data['Price-GS'],color='g', label='GS')
+    plt.title('Goldman Sachs',fontname="Times New Roman Bold")
     #axs[1].set_xlabel('Time')
-    axs[1].set_ylabel('Price')
+    plt.ylabel('Price')
+    plt.show()
     
-    
-    axs[2].plot(data.index,data['Price-Amazon'],color='b', label='AMAZON')
-    axs[2].set_title('Amazon', fontname="Times New Roman Bold")
+    plt.plot(data['Price-Amazon'],color='b', label='AMAZON')
+    plt.title('Amazon', fontname="Times New Roman Bold")
     #axs[2].set_xlabel('Time')
-    axs[2].set_ylabel('Price')
-
-
+    plt.ylabel('Price')
 
     plt.show()
 
@@ -133,20 +125,25 @@ def extract_data(soup_list):
     for soup in soup_list:
         results = soup.find("div", {"data-field" : "Mid"})
         span=results.find("span", {"class" : "push-data aktien-big-font text-nowrap no-padding-at-all"})
-        result_list.append(span.text)
+        price=span.text
+        print(price)
+        if price.find(',')!=-1:
+            print(price)
+            res=float(price.replace(',',''))
+            #res=float(res)
+            print("NEW:",res)
+            result_list.append(float(res))
+        else:
+            result_list.append(float(span.text))
     
     result_list.append(time.ctime())
     #print(result_list)
         #break
     df.loc[len(df)] = result_list
-    df.index=df["Time"]
-    data=df.drop(columns="Time",axis=0)
-    print(data)
-    
-    
+    #df.index=df["Time"]
 
-
-    analysis(data)
+ 
+    analysis(df)
     
 
 
