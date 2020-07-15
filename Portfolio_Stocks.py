@@ -19,6 +19,7 @@ def texttoaudio(text):
     pygame.mixer.music.load('text.mp3')
     pygame.mixer.music.play(0)
     os.remove("text.mp3") #remove file from system
+    time.sleep(3)
 
 
 def analysis(data):
@@ -33,97 +34,68 @@ def analysis(data):
     BMS=data['Price-BMS']
     GS=data['Price-GS']
     AMAZON=data['Price-Amazon']
-    if len(data)>1:
+    if length>1:
 
         #BMS
-    
-        if BMS[length-1]>BMS[length-2]: #New price higher than previous price
-            pygame.mixer.music.load('Ta_da.mp3')
-            pygame.mixer.music.play(0)
-            change_percentage=float((BMS[length-1]-BMS[length-2])/BMS[length-2])*100
-            text="B M S Stock Price went up by "+str(change_percentage)+" percent"
-            texttoaudio(text)
-            
-      
-          
-            
-        elif BMS[length-1]<BMS[length-2]:
-            
-                 
-            pygame.mixer.music.load('Sad.mp3')
-            pygame.mixer.music.play(0)
-            
-            change_percentage=float(abs(BMS[length-1]-BMS[length-2])/BMS[length-2])*100
-            text="B M S Stock Price went down by "+str(change_percentage)+" percent"
-            texttoaudio(text)
-
-
-        else:
-            print("No Change")
-            change_percentage=float(abs(BMS[length-1]-BMS[length-2])/BMS[length-2])*100
-            text="B M S stock price has not changed."
-            texttoaudio(text)
-            
-    
-        #Goldman Sachs
-        if GS[length-1]>GS[length-2]: #New price higher than previous price
-            pygame.mixer.music.load('Ta_da.mp3')
-            pygame.mixer.music.play(0)
-            change_percentage=float((GS[length-1]-GS[length-2])/GS[length-2])*100
-            text="Goldman Sachs Stock Price went up by "+str(change_percentage)+" percent"
-            texttoaudio(text)
-            
-      
-          
-            
-        elif GS[length-1]<GS[length-2]:
-            
-                 
-            pygame.mixer.music.load('Sad.mp3')
-            pygame.mixer.music.play(0)
-            
-            change_percentage=float(abs(GS[length-1]-GS[length-2])/GS[length-2])*100
-            text="Goldman Sachs Stock Price went down by "+str(change_percentage)+" percent"
-            texttoaudio(text)
-
-
-        else:
-            print("No Change")
-            change_percentage=float(abs(GS[length-1]-GS[length-2])/GS[length-2])*100
-            text="Goldman Sachs stock price has not changed."
-            texttoaudio(text)
-            
-
-        #Amazon
         
-        if AMAZON[length-1]>AMAZON[length-2]: #New price higher than previous price
-            pygame.mixer.music.load('Ta_da.mp3')
-            pygame.mixer.music.play(0)
-            change_percentage=float((AMAZON[length-1]-AMAZON[length-2])/AMAZON[length-2])*100
-            text="AMAZON Stock Price went up by "+str(change_percentage)+" percent"
-            texttoaudio(text)
+        count=0
+        for i in (BMS,GS,AMAZON):
             
-      
+            if count==0:
+                company='B M S'
+            elif count==1:
+                company='Goldman Sachs'
+            else:
+                company='Amazon'
+            
+        
+            new=i[length-1]
+            previous=i[length-2]
+            
+            #Sometimes if the price is 4 digits (6,243.53), remove the comma
+            if new.find(',')!=-1:
+                new=new.replace(',','')
+ 
+
+            if previous.find(',')!=-1:
+                previous=previous.replace(',','')
+                
+            
+            
+            new=float(new)
+            previous=float(previous)
+            print("NEW: ",new)
+            print("PREVIOUS: ",previous)
+                
+            change_percentage=float((new-previous)/previous)*100
+         
+    
+            if new>previous: #New price higher than previous price
+                pygame.mixer.music.load('Ta_da.mp3')
+                pygame.mixer.music.play(0)
+                text= company +" Stock Price went up by "+str(change_percentage)+" percent"
+                texttoaudio(text)
+                
           
+              
+                
+            elif new<previous:
+                
+                     
+                pygame.mixer.music.load('Sad.mp3')
+                pygame.mixer.music.play(0)
+                
+                text=company+" Stock Price went down by "+str(change_percentage)+" percent"
+                texttoaudio(text)
+    
+    
+            else:
+                print("No Change")
+                text=company +" stock price has not changed."
+                texttoaudio(text)
             
-        elif AMAZ0N[length-1]<AMAZON[length-2]:
-            
-                 
-            pygame.mixer.music.load('Sad.mp3')
-            pygame.mixer.music.play(0)
-            
-            change_percentage=float(abs(AMAZON[length-1]-AMAZON[length-2])/AMAZON[length-2])*100
-            text="Amazon Stock Price went down by "+str(change_percentage)+" percent"
-            texttoaudio(text)
-
-
-        else:
-            print("No Change")
-            change_percentage=float(abs(AMAZON[length-1]-AMAZON[length-2])/AMAZON[length-2])*100
-            text="AMAZON stock price has not changed."
-            texttoaudio(text)
-            
-
+            count=count+1
+        
 
     plotgraph(data)
     
