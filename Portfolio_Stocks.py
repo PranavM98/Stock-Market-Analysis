@@ -19,7 +19,7 @@ def texttoaudio(text):
     pygame.mixer.music.load('text.mp3')
     pygame.mixer.music.play(0)
     os.remove("text.mp3") #remove file from system
-    time.sleep(8)
+    time.sleep(6)
 
 
 def analysis(data):
@@ -60,9 +60,10 @@ def analysis(data):
             print("PREVIOUS: ",previous)
             print("NEW: ",new)
 
-                
+            
             change_percentage=round(float((new-previous)/previous)*100,2)
          
+   
     
             if new>previous: #New price higher than previous price
                 pygame.mixer.music.load('Ta_da.mp3')
@@ -79,7 +80,7 @@ def analysis(data):
                 #pygame.mixer.music.load('Sad.mp3')
                 #pygame.mixer.music.play(0)
                 
-                text=company+" Stock Price went down by "+str(change_percentage)+" percent"
+                text= company+" Stock Price went down by "+str(change_percentage)+" percent"
                 texttoaudio(text)
     
     
@@ -93,28 +94,78 @@ def analysis(data):
 
     plotgraph(data)
     
+    
+def moving_average(data):
+    
+    #Number of Companies
+    for i in range(3):
+        ma=sum(data.iloc[-5:,i])/5
+        
+        if i==0:
+            MA_BMS.append(ma)
+        elif i==1:
+            MA_GS.append(ma)
+        else:
+            MA_Amazon.append(ma)
+    
+    MA_BMS
+    MA_GS
+    MA_Amazon
+    
+    return data,MA_BMS,MA_GS,MA_Amazon
+    
 def plotgraph(data):
 
     #fig, axs = plt.subplots(3,1,constrained_layout=True)
 
-    plt.plot(data['Price-BMS'], color='r', label='BMS')
-    plt.title('Bristol Myers Squibb',fontname="Times New Roman Bold")
-    #axs[0].set_xlabel('Time')
-    plt.ylabel('Price')
-    plt.show()
+    if len(data)>5:
+        data,MA_BMS,MA_GS,MA_Amazon=moving_average(data)
+        
+        plt.plot(data['Price-BMS'], color='r', label='BMS')
+        plt.plot(data.index,MA_BMS, label='MA-BMS')
+        plt.title('Bristol Myers Squibb',fontname="Times New Roman Bold")
+        #axs[0].set_xlabel('Time')
+        plt.ylabel('Price')
+        plt.legend()
+        plt.show()
+        
+        plt.plot(data['Price-GS'],color='g', label='GS')
+        plt.plot(data.index,MA_GS,label='MA_GS')
+        plt.title('Goldman Sachs',fontname="Times New Roman Bold")
+        
+        #axs[1].set_xlabel('Time')
+        plt.ylabel('Price')
+        plt.legend()
+        plt.show()
+        
+        plt.plot(data['Price-Amazon'],color='b', label='AMAZON')
+        plt.plot(data.index,MA_Amazon,label='MA_Amazon')
+        plt.title('Amazon', fontname="Times New Roman Bold")
+        #axs[2].set_xlabel('Time')
+        plt.ylabel('Price')
+        plt.legend()
     
-    plt.plot(data['Price-GS'],color='g', label='GS')
-    plt.title('Goldman Sachs',fontname="Times New Roman Bold")
-    #axs[1].set_xlabel('Time')
-    plt.ylabel('Price')
-    plt.show()
+        plt.show()
+        
+    else:    
+        plt.plot(data['Price-BMS'], color='r', label='BMS')
+        plt.title('Bristol Myers Squibb',fontname="Times New Roman Bold")
+        #axs[0].set_xlabel('Time')
+        plt.ylabel('Price')
+        plt.show()
+        
+        plt.plot(data['Price-GS'],color='g', label='GS')
+        plt.title('Goldman Sachs',fontname="Times New Roman Bold")
+        #axs[1].set_xlabel('Time')
+        plt.ylabel('Price')
+        plt.show()
+        
+        plt.plot(data['Price-Amazon'],color='b', label='AMAZON')
+        plt.title('Amazon', fontname="Times New Roman Bold")
+        #axs[2].set_xlabel('Time')
+        plt.ylabel('Price')
     
-    plt.plot(data['Price-Amazon'],color='b', label='AMAZON')
-    plt.title('Amazon', fontname="Times New Roman Bold")
-    #axs[2].set_xlabel('Time')
-    plt.ylabel('Price')
-
-    plt.show()
+        plt.show()
 
 
 
@@ -137,8 +188,10 @@ def extract_data(soup_list):
             result_list.append(float(span.text))
     
     result_list.append(time.ctime())
+
+    
     #print(result_list)
-        #break
+            #break
     df.loc[len(df)] = result_list
     #df.index=df["Time"]
 
@@ -174,6 +227,9 @@ def url():
 
 if __name__ == "__main__":
     df=pd.DataFrame(columns=["Price-BMS","Price-GS","Price-Amazon","Time"])
+    MA_BMS=[np.nan]*5
+    MA_GS=[np.nan]*5
+    MA_Amazon=[np.nan]*5
     count=0
     final_lst=[]
     url()
