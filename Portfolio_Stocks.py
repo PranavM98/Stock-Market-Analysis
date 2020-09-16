@@ -108,9 +108,7 @@ def moving_average(data):
         else:
             MA_Amazon.append(ma)
     
-    MA_BMS
-    MA_GS
-    MA_Amazon
+    final_data=zip(data,MA_BMS,MA_GS,MA_Amazon)
     
     return data,MA_BMS,MA_GS,MA_Amazon
     
@@ -122,7 +120,7 @@ def plotgraph(data):
         data,MA_BMS,MA_GS,MA_Amazon=moving_average(data)
         
         plt.plot(data['Price-BMS'], color='r', label='BMS')
-        plt.plot(data.index,MA_BMS, label='MA-BMS')
+        plt.plot(data.index,MA_BMS, color='y',label='MA-BMS')
         plt.title('Bristol Myers Squibb',fontname="Times New Roman Bold")
         #axs[0].set_xlabel('Time')
         plt.ylabel('Price')
@@ -130,7 +128,7 @@ def plotgraph(data):
         plt.show()
         
         plt.plot(data['Price-GS'],color='g', label='GS')
-        plt.plot(data.index,MA_GS,label='MA_GS')
+        plt.plot(data.index,MA_GS,color='y',label='MA_GS')
         plt.title('Goldman Sachs',fontname="Times New Roman Bold")
         
         #axs[1].set_xlabel('Time')
@@ -139,7 +137,7 @@ def plotgraph(data):
         plt.show()
         
         plt.plot(data['Price-Amazon'],color='b', label='AMAZON')
-        plt.plot(data.index,MA_Amazon,label='MA_Amazon')
+        plt.plot(data.index,MA_Amazon,color='y',label='MA_Amazon')
         plt.title('Amazon', fontname="Times New Roman Bold")
         #axs[2].set_xlabel('Time')
         plt.ylabel('Price')
@@ -174,8 +172,8 @@ def plotgraph(data):
 def extract_data(soup_list):
     result_list=[]
     for soup in soup_list:
-        results = soup.find("div", {"data-field" : "Mid"})
-        span=results.find("span", {"class" : "push-data aktien-big-font text-nowrap no-padding-at-all"})
+        results = soup.find("div", {"class" : "price-section__values"})
+        span=results.find("span", {"class" : "price-section__current-value"})
         price=span.text
         print(price)
         if price.find(',')!=-1:

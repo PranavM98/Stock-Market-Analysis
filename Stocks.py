@@ -87,8 +87,8 @@ def plotgraph(df):
 
 
 def extract_data(soup):
-    results = soup.find("div", {"data-field" : "Mid"})
-    span=results.find("span", {"class" : "push-data aktien-big-font text-nowrap no-padding-at-all"})
+    results = soup.find("div", {"class" : "price-section__values"})
+    span=results.find("span", {"class" : "price-section__current-value"})
     print(span.text, end=' ')
     print(time.ctime())
     analysis(span)
